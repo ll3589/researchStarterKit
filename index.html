@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Starter Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF7F0; --paper:#FFFFFF; --ink:#1E2433; --muted:#5B6475; --line:#E7E0D3;
+    --qual:#0B6A6A; --qual-soft:#E2F3F2;
+    --quant:#6A3FB5; --quant-soft:#EEE7FA;
+    --bad:#C2410C; --bad-soft:#FDECE3;
+    --good:#276B2A; --good-soft:#E6F4E6;
+    --accent:#F2B705; --accent-soft:#FFF5D6;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito Sans",system-ui,sans-serif;font-size:17px;line-height:1.6}
+  h1,h2,h3,h4{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.15;margin:0 0 .5em}
+  h1{font-size:clamp(2rem,4.5vw,3.1rem);font-weight:800;letter-spacing:-.02em}
+  h2{font-size:clamp(1.45rem,2.6vw,1.9rem);font-weight:700;letter-spacing:-.01em}
+  h3{font-size:1.2rem;font-weight:700}
+  p{margin:0 0 1em}
+  a{color:var(--quant)}
+  button{font:inherit;cursor:pointer}
+  :focus-visible{outline:3px solid #B8860B;outline-offset:3px;border-radius:6px}
+  .skip{position:absolute;left:-9999px;top:.5rem;z-index:100;background:var(--ink);color:#fff;padding:.6rem 1rem;border-radius:10px;font-weight:700}
+  .skip:focus{left:.75rem}
+  [tabindex="-1"]:focus{outline:none}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+  .tab .short{display:none}
+  @media (max-width:640px){
+    html,body{font-size:16px}
+    .bar{padding:.6rem .9rem;gap:.5rem}
+    .brand{font-size:1rem}
+    .tabs{width:100%}
+    .tab{flex:1 1 0;min-width:0;white-space:normal;padding:.5rem .4rem;font-size:.88rem;line-height:1.2}
+    .tab .num{display:none}
+    .tab .long{display:none}.tab .short{display:inline}
+    main{padding:1.2rem .9rem 3rem}
+    .block{margin:2.2rem 0}
+    .card{padding:1.1rem}
+    .spotlight{padding:1.3rem;border-radius:18px}
+    .aq{font-size:1.1rem}
+    .quiz-actions button{flex:1}
+    .detail-nav button{font-size:.85rem;padding:.5rem .7rem}
+    .read-order .arrow{display:none}
+    .read-order{flex-direction:column;align-items:stretch}
+  }
+
+  /* Header + tabs */
+  header{position:sticky;top:0;z-index:20;background:rgba(251,247,240,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .bar{max-width:1080px;margin:0 auto;padding:.8rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+  .brand{font-family:"Bricolage Grotesque";font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:.5rem;margin-right:auto}
+  .brand .dot{width:28px;height:28px;border-radius:8px;background:var(--ink);color:var(--accent);display:grid;place-items:center;font-size:.95rem}
+  .tabs{display:flex;gap:.35rem;background:#EFE8DB;padding:.3rem;border-radius:999px}
+  .tab{border:0;background:transparent;padding:.5rem 1rem;border-radius:999px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .tab[aria-selected="true"]{background:var(--ink);color:#fff}
+  .tab .num{display:inline-block;width:1.4em;height:1.4em;border-radius:50%;background:rgba(0,0,0,.08);font-size:.8em;line-height:1.4em;text-align:center;margin-right:.35rem}
+  .tab[aria-selected="true"] .num{background:var(--accent);color:var(--ink)}
+
+  main{max-width:1080px;margin:0 auto;padding:2rem 1.25rem 4rem}
+  section.panel[hidden]{display:none}
+  .block{margin:3rem 0}
+  .eyebrow{font-weight:700;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+  .lede{font-size:1.15rem;color:var(--muted);max-width:44rem}
+  .hero{padding:1.5rem 0 .5rem}
+  .hero h1 mark{background:linear-gradient(transparent 60%,var(--accent) 60%);color:inherit;padding:0 .1em}
+
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.1rem}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+
+  .pill{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:700;padding:.2rem .65rem;border-radius:999px;letter-spacing:.02em}
+  .pill.qual{background:var(--qual-soft);color:var(--qual)}
+  .pill.quant{background:var(--quant-soft);color:var(--quant)}
+  .pill.bad{background:var(--bad-soft);color:var(--bad)}
+  .pill.good{background:var(--good-soft);color:var(--good)}
+
+  /* Two types */
+  .type{border-top:6px solid}
+  .type.qual{border-top-color:var(--qual)}
+  .type.quant{border-top-color:var(--quant)}
+  .type .starter{font-family:"Bricolage Grotesque";font-size:1.6rem;font-weight:800;margin:.3rem 0 .6rem}
+  .type.qual .starter{color:var(--qual)}
+  .type.quant .starter{color:var(--quant)}
+  .type dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.35rem .9rem;font-size:.95rem}
+  .type dt{font-weight:700;color:var(--muted)}
+  .type dd{margin:0}
+  .example{margin-top:1rem;padding:.9rem 1rem;border-radius:12px;font-style:italic}
+  .type.qual .example{background:var(--qual-soft)}
+  .type.quant .example{background:var(--quant-soft)}
+
+  .tip{display:flex;gap:1rem;align-items:flex-start;background:var(--accent-soft);border:1px solid #F1DE9C;border-radius:var(--radius);padding:1.1rem 1.3rem;margin-top:1.1rem}
+  .tip .icon{font-size:1.5rem;line-height:1}
+  .tip p:last-child{margin:0}
+
+  /* Ingredients */
+  .ing{display:flex;gap:.8rem;align-items:flex-start}
+  .ing .n{flex:none;width:2rem;height:2rem;border-radius:10px;background:var(--ink);color:#fff;font-weight:800;display:grid;place-items:center;font-family:"Bricolage Grotesque"}
+  .ing h3{font-size:1.02rem;margin:.15rem 0 .2rem}
+  .ing p{font-size:.93rem;color:var(--muted);margin:0}
+
+  /* Flashcards */
+  .fc-bar{display:flex;justify-content:flex-end;margin:.4rem 0 .6rem}
+  .fc-grid,.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+  @media (max-width:860px){.fc-grid,.plan{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:560px){.fc-grid,.plan{grid-template-columns:1fr}}
+  .fc{perspective:1000px;border:0;background:none;padding:0;text-align:left;color:inherit;width:100%}
+  .fc-inner{display:grid;width:100%;min-height:210px;transition:transform .55s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+  .fc.flipped .fc-inner{transform:rotateY(180deg)}
+  .fc-face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius);padding:1.2rem;display:flex;flex-direction:column}
+  .fc-front{background:var(--paper);border:1px solid var(--line)}
+  .fc-front .n{width:2.2rem;height:2.2rem;border-radius:10px;background:var(--ink);color:#fff;font-weight:800;display:grid;place-items:center;font-family:"Bricolage Grotesque"}
+  .fc-front h3{font-size:1.3rem;margin:.9rem 0 .3rem}
+  .fc-front p{color:var(--muted);margin:0;font-size:.98rem}
+  .fc-front .hint{margin-top:auto;padding-top:.8rem;font-size:.82rem;font-weight:700;color:var(--muted)}
+  .fc-back{background:var(--ink);color:#F4F1EA;transform:rotateY(180deg);gap:.55rem;justify-content:center}
+  .fc-back .lbl{font-size:.72rem;font-weight:800;letter-spacing:.1em;color:var(--accent)}
+  .fc-back .no{color:#F3A98A;text-decoration:line-through;text-decoration-color:rgba(243,169,138,.6);font-size:.95rem}
+  .fc-back .yes{font-weight:700;font-size:1.02rem;color:#fff}
+  .fc-back .yes::before{content:"✓ ";color:#8BD18E}
+  .fc:hover .fc-front{border-color:#CFC5B2}
+  @media (prefers-reduced-motion:reduce){.fc-inner{transition:none}}
+  .assembled{margin-top:1.3rem;background:var(--qual-soft);border-radius:var(--radius);padding:1.3rem 1.4rem}
+  .aq{font-family:"Bricolage Grotesque";font-size:1.3rem;font-weight:700;line-height:1.7}
+  .aq .u{border-bottom:3px solid var(--qual);position:relative}
+  .aq .u::after{content:attr(data-n);position:relative;top:-.7em;font-size:.6em;background:var(--ink);color:#fff;border-radius:50%;width:1.35em;height:1.35em;display:inline-grid;place-items:center;margin-left:.15em}
+
+  /* Trend plan */
+  .plan{list-style:none;padding:0;margin:1.2rem 0 0}
+  .plan li{display:flex;flex-direction:column}
+  .plan .pn{width:2rem;height:2rem;border-radius:50%;background:var(--qual);color:#fff;font-weight:800;display:grid;place-items:center;font-family:"Bricolage Grotesque"}
+  .plan h3{font-size:1.08rem;margin:.6rem 0 .25rem}
+  .plan p{font-size:.93rem;color:var(--muted);margin:0 0 .7rem}
+  .plan .ex{margin-top:auto;font-size:.82rem;font-weight:700;background:var(--qual-soft);color:var(--qual);padding:.3rem .6rem;border-radius:8px;align-self:flex-start}
+  table.sheet td{vertical-align:top}
+  table.sheet .pill{white-space:nowrap}
+  .watch{margin-top:1.4rem;background:var(--bad-soft);border:1px solid #F6CDB7;border-radius:var(--radius);padding:1.2rem 1.4rem}
+  .watch ul{margin:0;padding-left:1.1rem}
+  .watch li{margin-bottom:.5rem}
+
+  /* Good vs bad */
+  .gb-nav{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+  .gb-nav button{border:1px solid var(--line);background:var(--paper);padding:.45rem .9rem;border-radius:999px;font-weight:600;font-size:.92rem}
+  .gb-nav button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .gb{display:grid;grid-template-columns:1fr 1.25fr;gap:1.1rem}
+  @media (max-width:760px){.gb{grid-template-columns:1fr}}
+  .gb .badq{background:var(--bad-soft);border:1px solid #F6CDB7}
+  .gb .badq .q{font-family:"Bricolage Grotesque";font-size:1.45rem;font-weight:700;margin:.6rem 0 1rem;text-decoration:line-through;text-decoration-color:rgba(194,65,12,.45);text-decoration-thickness:2px}
+  .gb .badq ul{margin:0;padding-left:1.1rem}
+  .gb .badq li{margin-bottom:.4rem}
+  .gb .badq li b{color:var(--bad)}
+  .upgrade{border-left:5px solid;padding:.9rem 1rem;border-radius:0 12px 12px 0;margin-bottom:.8rem;background:var(--paper)}
+  .upgrade.qual{border-color:var(--qual)}
+  .upgrade.quant{border-color:var(--quant)}
+  .upgrade .q{font-weight:700;font-size:1.05rem;margin:.4rem 0 .3rem}
+  .upgrade .why{font-size:.9rem;color:var(--muted);margin:0}
+  .reveal-btn{border:0;background:var(--ink);color:#fff;padding:.7rem 1.2rem;border-radius:12px;font-weight:700;margin-top:.5rem}
+
+  /* Spotlight */
+  .spotlight{background:var(--ink);color:#F4F1EA;border-radius:22px;padding:2rem;display:grid;grid-template-columns:1.2fr 1fr;gap:2rem;align-items:center}
+  @media (max-width:760px){.spotlight{grid-template-columns:1fr}}
+  .spotlight .eyebrow{color:var(--accent)}
+  .spotlight h2{color:#fff}
+  .spotlight .bigq{font-family:"Bricolage Grotesque";font-size:1.35rem;font-weight:700;color:#fff;border-left:4px solid var(--accent);padding-left:1rem;margin:1rem 0}
+  .chain{display:grid;gap:.6rem}
+  .chain div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:.7rem .9rem;font-size:.95rem}
+  .chain b{color:var(--accent)}
+  .spotlight a{color:var(--accent)}
+
+  /* Builder */
+  .builder{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+  @media (max-width:820px){.builder{grid-template-columns:1fr}}
+  .seg{display:inline-flex;background:#EFE8DB;padding:.25rem;border-radius:12px;margin-bottom:1rem}
+  .seg button{border:0;background:transparent;padding:.5rem 1rem;border-radius:9px;font-weight:700;color:var(--muted)}
+  .seg button[aria-pressed="true"].q1{background:var(--qual);color:#fff}
+  .seg button[aria-pressed="true"].q2{background:var(--quant);color:#fff}
+  label.f{display:block;font-weight:700;font-size:.9rem;margin:.8rem 0 .3rem}
+  label.f span{font-weight:400;color:var(--muted)}
+  input[type=text],select{width:100%;padding:.65rem .8rem;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:#fff;color:var(--ink)}
+  input[type=text]:focus,select:focus{border-color:var(--ink);outline:none}
+  .preview{background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:1.2rem;min-height:120px}
+  .preview .out{font-family:"Bricolage Grotesque";font-size:1.35rem;font-weight:700;margin:.4rem 0 1rem}
+  .preview .out .blank{color:#6F6656;font-weight:600}
+  .checks{list-style:none;padding:0;margin:0;font-size:.93rem}
+  .checks li{display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.45rem}
+  .checks .ic{flex:none;width:1.3rem;text-align:center;font-weight:800}
+  .checks .ok{color:var(--good)}
+  .checks .warn{color:var(--bad)}
+  .checks .todo{color:#6F6656}
+  .copy{border:1.5px solid var(--ink);background:#fff;padding:.5rem .9rem;border-radius:10px;font-weight:700;margin-top:.6rem}
+  .fill-ex{border:0;background:none;color:var(--quant);text-decoration:underline;padding:0;font-size:.9rem}
+
+  /* Quiz */
+  .quiz-q{font-family:"Bricolage Grotesque";font-size:1.3rem;font-weight:700;margin:.6rem 0 1rem;min-height:3.2em}
+  .quiz-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+  .quiz-actions button{border:2px solid;background:#fff;padding:.65rem 1.2rem;border-radius:12px;font-weight:800}
+  .quiz-actions .qual{border-color:var(--qual);color:var(--qual)}
+  .quiz-actions .quant{border-color:var(--quant);color:var(--quant)}
+  .quiz-actions button:disabled{opacity:.45;cursor:default}
+  .feedback{margin-top:1rem;padding:.9rem 1rem;border-radius:12px;display:none}
+  .feedback.show{display:block}
+  .feedback.right{background:var(--good-soft)}
+  .feedback.wrong{background:var(--bad-soft)}
+  .progress{display:flex;gap:.3rem;margin-bottom:.4rem}
+  .progress i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+  .progress i.done{background:var(--ink)}
+  .next{border:0;background:var(--ink);color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-weight:700;margin-top:.8rem}
+
+  /* Paper tab: hourglass */
+  .anatomy{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:1.6rem;align-items:start}
+  @media (max-width:860px){.anatomy{grid-template-columns:1fr}}
+  .hourglass{display:flex;flex-direction:column;align-items:center;gap:6px;position:sticky;top:90px}
+  @media (max-width:860px){.hourglass{position:static}}
+  .hg{border:0;color:#fff;font-weight:800;font-family:"Bricolage Grotesque";padding:.75rem .5rem;border-radius:10px;transition:transform .15s, box-shadow .15s;font-size:1rem;position:relative}
+  .hg small{display:block;font-family:"Nunito Sans";font-weight:600;font-size:.75rem}
+  .hg:hover{transform:translateY(-2px)}
+  .hg[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 6px var(--ink)}
+  .slots{list-style:none}
+  .hg-note{font-size:.82rem;color:var(--muted);text-align:center;margin-top:.6rem;max-width:300px}
+
+  .detail h2{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+  .detail .meta{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+  .detail .meta span{font-size:.82rem;font-weight:700;background:#EFE8DB;padding:.2rem .65rem;border-radius:999px}
+  .detail h3.sub{font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:1.3rem 0 .5rem;font-family:"Nunito Sans"}
+  .detail ul{margin:0;padding-left:1.2rem}
+  .detail li{margin-bottom:.3rem}
+  .mock{background:#FFFDF7;border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:0 12px 12px 0;padding:1rem 1.1rem;font-family:Georgia,"Times New Roman",serif;font-size:.98rem}
+  .mock p:last-child{margin:0}
+  .real{background:var(--qual-soft);border-radius:12px;padding:1rem 1.1rem;font-size:.95rem}
+  .real p:last-child{margin:0}
+  .hanging{padding-left:2.2em;text-indent:-2.2em}
+  table.data{border-collapse:collapse;width:100%;font-family:"Nunito Sans";font-size:.92rem;margin:.5rem 0}
+  table.data th,table.data td{border-bottom:1px solid var(--line);padding:.45rem .5rem;text-align:left}
+  table.data th{font-weight:800}
+  .detail-nav{display:flex;justify-content:space-between;margin-top:1.4rem;gap:.5rem}
+  .detail-nav button{border:1.5px solid var(--ink);background:#fff;padding:.5rem 1rem;border-radius:10px;font-weight:700}
+  .detail-nav button:disabled{opacity:.3;cursor:default}
+
+  /* order game */
+  .slots{display:flex;flex-wrap:wrap;gap:.5rem;min-height:3rem;padding:.7rem;border:2px dashed var(--line);border-radius:12px;margin-bottom:1rem;background:#fff}
+  .slots .chip{background:var(--ink);color:#fff}
+  .bank{display:flex;flex-wrap:wrap;gap:.5rem}
+  .chip{border:1.5px solid var(--ink);background:#fff;padding:.45rem .9rem;border-radius:999px;font-weight:700;font-size:.95rem}
+  .chip.wrong{animation:shake .35s;border-color:var(--bad);color:var(--bad)}
+  @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .game-msg{margin-top:.8rem;font-weight:700;min-height:1.6em}
+
+  .read-order{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.6rem}
+  .read-order span.step{background:var(--paper);border:1px solid var(--line);padding:.4rem .8rem;border-radius:10px;font-weight:700}
+  .read-order .arrow{color:var(--muted)}
+
+  footer{max-width:1080px;margin:0 auto;padding:1.5rem 1.25rem 3rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  /* Phone overrides (kept last so they win) */
+  @media (max-width:640px){
+    .tab{flex:1 1 0;min-width:0;white-space:normal;padding:.55rem .4rem;font-size:.9rem;line-height:1.2}
+    .tab .num{display:none}
+    .detail .meta span{border-radius:10px}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header>
+  <div class="bar">
+    <div class="brand"><span class="dot" aria-hidden="true">?</span> Research Starter Kit</div>
+    <div class="tabs" role="tablist" aria-label="Lessons">
+      <button class="tab" role="tab" id="tab-question" aria-controls="question" aria-selected="true" type="button"><span class="num" aria-hidden="true">1</span><span class="long">Asking a research question</span><span class="short">Research question</span></button>
+      <button class="tab" role="tab" id="tab-paper" aria-controls="paper" aria-selected="false" type="button" tabindex="-1"><span class="num" aria-hidden="true">2</span><span class="long">Inside a research paper</span><span class="short">Paper structure</span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+<!-- ===================== TAB 1 ===================== -->
+<section class="panel" id="question" role="tabpanel" aria-labelledby="tab-question" tabindex="0">
+
+  <div class="hero">
+    <div class="eyebrow">Lesson 1</div>
+    <h1>Every great project starts with a <mark>great question.</mark></h1>
+    <p class="lede">A research question is the one sentence your whole project is built to answer. Get it right and everything else (what data to collect, how to analyze it, what to write) falls into place. Get it wrong and you'll be stuck researching "everything about social media" forever.</p>
+  </div>
+
+  <!-- Two kinds -->
+  <div class="block">
+    <div class="eyebrow">Step 1</div>
+    <h2>First, pick your type of question</h2>
+    <p class="lede">Most research falls into two families. The type of question you ask decides the kind of data you'll collect.</p>
+
+    <div class="grid2" style="margin-top:1.2rem">
+      <div class="card type qual">
+        <span class="pill qual">QUALITATIVE</span>
+        <div class="starter">Ask "How…?"</div>
+        <p>Explores <b>experiences, meanings, and processes</b>. You want to understand what something is like from people's point of view.</p>
+        <dl>
+          <dt>Data</dt><dd>Words: interviews, open-ended survey answers, social media posts, observations</dd>
+          <dt>Answer</dt><dd>Themes and patterns, backed by quotes</dd>
+          <dt>Sample</dt><dd>Smaller and deeper (e.g., 8–30 people)</dd>
+        </dl>
+        <div class="example">"How do high school students decide what to post on their Instagram 'Close Friends' story versus their main feed?"</div>
+      </div>
+
+      <div class="card type quant">
+        <span class="pill quant">QUANTITATIVE</span>
+        <div class="starter">Ask a yes/no question</div>
+        <p>Tests whether there's a <b>relationship or difference</b> between things you can <b>measure with numbers</b>.</p>
+        <dl>
+          <dt>Data</dt><dd>Numbers: surveys with rating scales, screen-time logs, test scores, experiments</dd>
+          <dt>Answer</dt><dd>Yes / no / how strongly, backed by statistics</dd>
+          <dt>Sample</dt><dd>Larger and broader (e.g., 50+ people)</dd>
+        </dl>
+        <div class="example">"Does scrolling TikTok for more than an hour before bed correlate with fewer hours of sleep among high school juniors?"</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="icon" aria-hidden="true">💡</div>
+      <div>
+        <p><b>Grad-school shortcut:</b> If you're asking <b>"how"</b>, you're probably doing qualitative research. If your question can be answered <b>"yes" or "no"</b> (Does…? Is…? Do…?), you're probably doing quantitative research.</p>
+        <p>It's a rule of thumb, not a law. Some qualitative questions start with "What" or "Why," and some quantitative ones ask "How much." But it's the quickest way to check that your question and your method match.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ingredients: flashcards -->
+  <div class="block">
+    <div class="eyebrow">Step 2</div>
+    <h2>Six checks for a strong question</h2>
+    <p class="lede">Let's sharpen one idea: <b>"mental health on TikTok."</b> Tap each card to see how it improves the question.</p>
+    <div class="fc-bar"><button type="button" class="copy" id="flipAll">Flip all</button></div>
+    <div class="fc-grid" id="fcGrid"></div>
+
+    <div class="assembled">
+      <div class="eyebrow">Put it all together</div>
+      <p class="aq">"How do <span class="u" data-n="1">TikTok creators and commenters</span> <span class="u" data-n="2">express experiences of anxiety</span> in the <span class="u" data-n="6">most-viewed #mentalhealth videos</span> <span class="u" data-n="3">posted during Mental Health Awareness Month (May 2026)</span>?"</p>
+      <p style="margin:0;color:var(--muted);font-size:.93rem">It starts with "How" and the data is posts and comments, so this is a <span class="pill qual">QUALITATIVE</span> question. Next step: how would you actually collect that data?</p>
+    </div>
+  </div>
+
+  <!-- Trend to data -->
+  <div class="block">
+    <div class="eyebrow">Step 3</div>
+    <h2>"I want to study a trend on social media… but how do I measure it?"</h2>
+    <p class="lede">You don't need to survey anyone to research social media. Public posts and comments can be your data. The trick is deciding <b>exactly which</b> posts before you start, so you're not just scrolling.</p>
+
+    <ol class="plan">
+      <li class="card"><span class="pn">1</span><h3>Pick your keywords</h3><p>Choose 1–3 hashtags and write them down <i>before</i> you search.</p><span class="ex">#mentalhealth, #anxiety</span></li>
+      <li class="card"><span class="pn" aria-hidden="true">2</span><h3><span class="sr">Step 2: </span>Set a time window</h3><p>Only include posts from a set date range. Record the day you collected data, because TikTok changes daily.</p><span class="ex">Posted May 1–31, 2026 · collected June 7</span></li>
+      <li class="card"><span class="pn" aria-hidden="true">3</span><h3><span class="sr">Step 3: </span>Choose your sample</h3><p>Set a rule for which videos and comments count, and stick to it.</p><span class="ex">10 most-viewed videos × 50 most-liked comments each</span></li>
+      <li class="card"><span class="pn" aria-hidden="true">4</span><h3><span class="sr">Step 4: </span>Save it in a spreadsheet</h3><p>One row per comment: video link, views, likes, and the comment paraphrased in your own words.</p><span class="ex">~500 rows</span></li>
+      <li class="card"><span class="pn" aria-hidden="true">5</span><h3><span class="sr">Step 5: </span>Code it</h3><p>Read everything once. Then tag each comment with short labels ("codes") for the ideas you see over and over.</p><span class="ex">humor as coping · self-diagnosis · asking for help</span></li>
+      <li class="card"><span class="pn" aria-hidden="true">6</span><h3><span class="sr">Step 6: </span>Find themes</h3><p>Group related codes into 3–5 big themes. Count how often each appears, and pick a few examples for each one. This is <b>thematic analysis</b>.</p><span class="ex">Theme: "Laughing so I don't cry"</span></li>
+    </ol>
+
+    <h3 style="margin-top:1.6rem">What your spreadsheet might look like</h3>
+    <div class="card" style="overflow-x:auto;padding:1rem" role="region" aria-label="Example spreadsheet (scrolls sideways)" tabindex="0">
+      <table class="data sheet">
+        <caption class="sr">Example coded comments from a TikTok study (made-up data)</caption>
+        <thead><tr><th>Video</th><th>Posted</th><th>Views</th><th>Comment (paraphrased)</th><th>Likes</th><th>Code</th></tr></thead>
+        <tbody>
+          <tr><td>V01</td><td>May 4</td><td>2.1M</td><td>Says they laughed at the video because it was exactly what their panic attacks feel like</td><td>18K</td><td><span class="pill quant">humor as coping</span></td></tr>
+          <tr><td>V01</td><td>May 4</td><td>2.1M</td><td>Asks whether the symptoms in the video mean they have anxiety</td><td>6.4K</td><td><span class="pill qual">self-diagnosis</span></td></tr>
+          <tr><td>V02</td><td>May 9</td><td>1.7M</td><td>Recommends that others talk to a school counselor and shares that it helped them</td><td>9.2K</td><td><span class="pill good">seeking support</span></td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:.82rem;color:var(--muted);margin:.5rem 0 0">Made-up rows for teaching.</p>
+    </div>
+
+    <div class="watch">
+      <h3><span aria-hidden="true">⚠️ </span>Watch out: common traps</h3>
+      <ul>
+        <li><b>"Trend" means change over time.</b> One month of posts gives you a snapshot. To claim a trend, compare two time windows (for example, May 2025 vs. May 2026).</li>
+        <li><b>The algorithm is personal.</b> TikTok shows you results based on <i>your</i> history. Search from a new account if you can, and mention this as a limitation.</li>
+        <li><b>"Most viewed" means most <i>visible</i>, not typical.</b> That's a fine choice. Just describe it accurately, and don't claim you studied "what TikTok users think."</li>
+        <li><b>Start smaller than you think.</b> 10 videos × 100 comments = 1,000 comments to read and code by hand. 50 comments per video is plenty for a first project.</li>
+        <li><b>Protect people, even on public posts.</b> Don't include usernames. Paraphrase comments so nobody can search them and find the person. Skip accounts that look like they belong to minors.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Good vs bad -->
+  <div class="block">
+    <div class="eyebrow">Step 4</div>
+    <h2>Good vs. needs-work: makeovers</h2>
+    <p class="lede">Each "needs work" question below is a real starting point students often have. Read it, try to spot what's wrong, then reveal the fix. Notice how each one can become <i>either</i> a qualitative or a quantitative question.</p>
+
+    <div class="gb-nav" id="gbNav" role="group" aria-label="Choose an example"></div>
+    <div class="gb" id="gbBox"></div>
+  </div>
+
+  <!-- Spotlight -->
+  <div class="block">
+    <div class="spotlight">
+      <div>
+        <div class="eyebrow">From a real published study</div>
+        <h2>Researchers interviewed students your age</h2>
+        <p>In a 2024 study published in the journal <i>Global Media and China</i>, a research team from Columbia University asked:</p>
+        <div class="bigq">How do middle school and high school students in China engage with news content on short video platforms like Douyin?</div>
+        <p style="font-size:.92rem;opacity:.85">Lei, Y., Meng, X., Huang, X., Li, J., Jiang, Y., Yu, Y., &amp; Literat, I. (2024). <a href="https://journals.sagepub.com/doi/full/10.1177/20594364241298055">Read the paper</a></p>
+      </div>
+      <div class="chain">
+        <div><b>Question starts with "How"</b><br>→ it's qualitative</div>
+        <div><b>So the method was interviews</b><br>→ 30 students, ages 13–18, from five provinces, over Zoom</div>
+        <div><b>So the results were themes</b><br>→ students valued objective news, had their own fact-checking habits, and preferred discussing news offline with people they trust</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Builder -->
+  <div class="block">
+    <div class="eyebrow">Step 5 · Try it</div>
+    <h2>Build your own question</h2>
+    <p class="lede">Pick a type, fill in the blanks, and watch the checklist react. Stuck? <button class="fill-ex" id="fillEx" type="button">Fill in an example</button></p>
+
+    <div class="builder" style="margin-top:1rem">
+      <div class="card">
+        <div class="seg" role="group" aria-label="Question type">
+          <button class="q1" id="bQual" aria-pressed="true" type="button">Qualitative · How</button>
+          <button class="q2" id="bQuant" aria-pressed="false" type="button">Quantitative · Yes/No</button>
+        </div>
+
+        <div id="fQual">
+          <label class="f" for="qlWho">Who? <span>(a specific group)</span></label>
+          <input type="text" id="qlWho" placeholder="e.g., high school seniors">
+          <label class="f" for="qlVerb">Do what?</label>
+          <select id="qlVerb">
+            <option>experience</option><option>describe</option><option>decide</option><option>use</option><option>make sense of</option><option>talk about</option><option>cope with</option>
+          </select>
+          <label class="f" for="qlWhat">What topic? <span>(the thing you're exploring)</span></label>
+          <input type="text" id="qlWhat" placeholder="e.g., pressure to post about college acceptances">
+          <label class="f" for="qlWhere">Where / when? <span>(context)</span></label>
+          <input type="text" id="qlWhere" placeholder="e.g., on Instagram during decision season">
+        </div>
+
+        <div id="fQuant" hidden>
+          <label class="f" for="qtX">Variable 1 <span>(something you can measure)</span></label>
+          <input type="text" id="qtX" placeholder="e.g., daily hours on TikTok">
+          <label class="f" for="qtRel">Relationship</label>
+          <select id="qtRel">
+            <option value="correlate with">correlate with</option>
+            <option value="predict">predict</option>
+            <option value="affect">affect (needs an experiment)</option>
+            <option value="differ by">differ by</option>
+          </select>
+          <label class="f" for="qtY">Variable 2 <span>(also measurable)</span></label>
+          <input type="text" id="qtY" placeholder="e.g., self-reported sleep quality (1–10)">
+          <label class="f" for="qtWho">Among whom?</label>
+          <input type="text" id="qtWho" placeholder="e.g., 11th graders at my school">
+        </div>
+      </div>
+
+      <div class="preview">
+        <div class="eyebrow">Your research question</div>
+        <div class="out" id="out" aria-label="Your question so far"></div>
+        <h3 class="sr">Checklist</h3>
+        <ul class="checks" id="checks"></ul>
+        <button class="copy" id="copyBtn" type="button">Copy question</button>
+        <span id="copyMsg" role="status" style="margin-left:.6rem;font-size:.9rem;color:var(--muted)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz -->
+  <div class="block">
+    <div class="eyebrow">Step 6 · Check yourself</div>
+    <h2>Qualitative or quantitative?</h2>
+    <div class="card" style="max-width:720px">
+      <div class="progress" id="quizProg"></div>
+      <div style="font-size:.85rem;color:var(--muted)" id="quizCount"></div>
+      <div class="quiz-q" id="quizQ" tabindex="-1"></div>
+      <div class="quiz-actions" role="group" aria-label="Your answer">
+        <button class="qual" id="ansQual" type="button">Qualitative</button>
+        <button class="quant" id="ansQuant" type="button">Quantitative</button>
+      </div>
+      <div class="feedback" id="quizFb" role="status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 2 ===================== -->
+<section class="panel" id="paper" role="tabpanel" aria-labelledby="tab-paper" tabindex="0" hidden>
+
+  <div class="hero">
+    <div class="eyebrow">Lesson 2</div>
+    <h1>The <mark>anatomy</mark> of a research paper</h1>
+    <p class="lede">Almost every research paper in psychology, education, and the social sciences follows the same structure. Once you know it, you can read any paper faster and write your own with a clear map.</p>
+  </div>
+
+  <div class="block" style="margin-top:1.5rem">
+    <div class="tip" style="margin-top:0">
+      <div class="icon" aria-hidden="true">⏳</div>
+      <div><p><b>Think of it as an hourglass.</b> A paper starts <b>wide</b> (why this topic matters to the world), narrows to <b>your specific study</b> (what exactly you did and found), then widens again (what it means for the world). Click any section to explore it.</p></div>
+    </div>
+  </div>
+
+  <div class="anatomy">
+    <div>
+      <div class="hourglass" id="hourglass" role="group" aria-label="Paper sections. Choose one to read about it."></div>
+      <p class="hg-note">The yellow running example is a <b>made-up student study</b>. The teal box shows how a <b>real published paper</b> did it.</p>
+    </div>
+    <div class="card detail" id="detail" tabindex="-1"></div>
+  </div>
+
+  <!-- Reading tip -->
+  <div class="block">
+    <div class="eyebrow">Pro tip</div>
+    <h2>Researchers don't read papers front to back</h2>
+    <p class="lede">When you're doing your literature review, you'll skim dozens of papers. Here's the order experienced researchers use to decide quickly whether a paper is useful:</p>
+    <div class="read-order">
+      <span class="step">1 · Title &amp; Abstract</span><span class="arrow">→</span>
+      <span class="step">2 · Discussion / Conclusion</span><span class="arrow">→</span>
+      <span class="step">3 · Tables &amp; figures</span><span class="arrow">→</span>
+      <span class="step">4 · Method</span><span class="arrow">→</span>
+      <span class="step">5 · Everything else, if it's a keeper</span>
+    </div>
+  </div>
+
+  <!-- Order game -->
+  <div class="block">
+    <div class="eyebrow">Check yourself</div>
+    <h2>Put the paper back together</h2>
+    <p class="lede">Click the sections in the order they appear in a paper.</p>
+    <div class="card" style="max-width:820px">
+      <ol class="slots" id="slots" aria-label="Your order so far"></ol>
+      <div class="bank" id="bank" role="group" aria-label="Sections left to place"></div>
+      <div class="game-msg" id="gameMsg" role="status"></div>
+      <button class="next" id="resetGame" type="button">Shuffle &amp; restart</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  Research Starter Kit · Built for high school students exploring research. Examples marked "made-up" are invented for teaching and are not real data.
+</footer>
+
+<script>
+/* ---------- Tabs with #hash ---------- */
+const tabs = {question: document.getElementById('tab-question'), paper: document.getElementById('tab-paper')};
+function showTab(name, push){
+  if(!tabs[name]) name='question';
+  for(const k in tabs){
+    const on = k===name;
+    tabs[k].setAttribute('aria-selected', on);
+    tabs[k].tabIndex = on ? 0 : -1;
+    document.getElementById(k).hidden = !on;
+  }
+  if(push && location.hash !== '#'+name){ try{ history.replaceState(null,'','#'+name);}catch(e){ location.hash=name; } }
+  window.scrollTo({top:0});
+}
+tabs.question.onclick=()=>showTab('question',true);
+tabs.paper.onclick=()=>showTab('paper',true);
+document.querySelector('.tabs').addEventListener('keydown',e=>{
+  const keys=['question','paper']; const cur=keys.findIndex(k=>tabs[k].getAttribute('aria-selected')==='true');
+  let n=null;
+  if(e.key==='ArrowRight') n=(cur+1)%2; else if(e.key==='ArrowLeft') n=(cur+1)%2; else if(e.key==='Home') n=0; else if(e.key==='End') n=1;
+  if(n!==null){e.preventDefault();showTab(keys[n],true);tabs[keys[n]].focus();}
+});
+window.addEventListener('hashchange',()=>showTab(location.hash.slice(1)));
+showTab(location.hash.slice(1)||'question');
+
+/* ---------- Flashcards ---------- */
+const cards=[
+  ["A specific WHO","Who, or whose posts, are you studying?","people on TikTok","TikTok creators and commenters"],
+  ["A specific WHAT","Name the exact thing you're looking at.","mental health","how people express experiences of anxiety"],
+  ["A context","Where and when?","on social media, whenever","#mentalhealth videos, May 2026"],
+  ["Not Google-able","Could a quick search answer it?","How many videos use #mentalhealth?","What themes show up in how people talk about anxiety?"],
+  ["Neutral","Does it assume the answer?","How does TikTok romanticize mental illness?","How do creators and commenters talk about anxiety?"],
+  ["Doable for you","Can you collect it in a few weeks?","every mental health video on TikTok","the 10 most-viewed videos, 50 top comments each"]
+];
+const fcGrid=document.getElementById('fcGrid');
+cards.forEach((c,i)=>{
+  const b=document.createElement('button'); b.type='button'; b.className='fc'; b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<div class="fc-inner">
+    <div class="fc-face fc-front"><div class="n" aria-hidden="true">${i+1}</div><span class="sr">Card ${i+1}: </span><span class="h3like" style="font-family:'Bricolage Grotesque';font-weight:700;font-size:1.3rem;margin:.9rem 0 .3rem;display:block">${c[0]}</span><p>${c[1]}</p><span class="hint" aria-hidden="true">Tap to flip ↻</span></div>
+    <div class="fc-face fc-back" aria-hidden="true"><span class="lbl">INSTEAD OF</span><span class="no">${c[2]}</span><span class="lbl">TRY</span><span class="yes">${c[3]}</span></div>
+  </div>`;
+  b.onclick=()=>setFlip(b,!b.classList.contains('flipped'));
+  fcGrid.appendChild(b);
+});
+function setFlip(b,f){
+  b.classList.toggle('flipped',f); b.setAttribute('aria-pressed',f);
+  b.querySelector('.fc-front').setAttribute('aria-hidden',f);
+  b.querySelector('.fc-back').setAttribute('aria-hidden',!f);
+}
+let allFlipped=false;
+document.getElementById('flipAll').onclick=e=>{
+  allFlipped=!allFlipped;
+  fcGrid.querySelectorAll('.fc').forEach(b=>setFlip(b,allFlipped));
+  e.target.textContent=allFlipped?'Flip all back':'Flip all';
+};
+
+/* ---------- Good vs bad ---------- */
+const makeovers = [
+  {label:"Social media", bad:"Is social media bad for teenagers?",
+   problems:[["Too broad:","\"social media\" covers dozens of apps and hundreds of behaviors."],["Not measurable:","what does \"bad\" mean? Bad for sleep? Grades? Mood?"],["Vague who:","\"teenagers\" everywhere, ages 13–19?"]],
+   qual:["How do 10th graders describe the way scrolling Instagram after school affects their mood?","Specific group, specific app, specific time. Explores their experience in their own words."],
+   quant:["Do 10th graders who spend more than 3 hours a day on social media report higher stress scores than those who spend less than 1 hour?","\"Bad\" became something measurable (a stress score) and \"social media\" became daily hours."]},
+  {label:"Phone \"addiction\"", bad:"Why are teens addicted to their phones?",
+   problems:[["Assumes the answer:","it already decided teens are \"addicted.\""],["Loaded term:","\"addiction\" is a clinical diagnosis, not an everyday word."],["Impossible scope:","the \"why\" for all teens everywhere."]],
+   qual:["How do high school students explain their reasons for checking their phones while doing homework?","Neutral (no \"addiction\"), specific situation, lets students explain in their own words."],
+   quant:["Does keeping phones in another room during homework increase the number of math problems students complete in 30 minutes?","A simple experiment you could actually run with classmates: two conditions, one number."]},
+  {label:"Study music", bad:"What is the best music to study to?",
+   problems:[["Opinion, not research:","\"best\" depends on the person."],["Google-able:","there are already hundreds of listicles."],["No who:","best for whom?"]],
+   qual:["How do high school students choose what music, if any, to play while studying for exams?","Shifts from \"what's best\" to understanding students' choices and reasoning."],
+   quant:["Do high school students score higher on a vocabulary quiz after studying with instrumental music than with music that has lyrics?","Two clear conditions and a measurable outcome (quiz score)."]},
+  {label:"TikTok news", bad:"How many teens use TikTok?",
+   problems:[["Google-able fact:","survey organizations like Pew Research Center already publish this."],["Just a count:","it describes, but doesn't explore an experience or test a relationship."],["Trap:","it starts with \"How\" but it isn't qualitative! \"How many\" asks for a number."]],
+   qual:["How do high school students decide whether a news video they see on TikTok is trustworthy?","A real \"how\" question about a process. Very close to the published study just below!"],
+   quant:["Is the amount of time students spend on TikTok each day related to how often they get their news there instead of from news websites?","Two measurable variables, one yes/no relationship."]},
+  {label:"Sleep & grades", bad:"Does sleep affect grades?",
+   problems:[["Close, but vague:","sleep how? Hours? Bedtime? Quality?"],["Which grades?","GPA? One class? One test?"],["\"Affect\" claims cause:","a survey can show a link (correlation), but proving cause needs an experiment."]],
+   qual:["How do high school seniors balance sleep with homework and extracurriculars during college application season?","Explores the real trade-offs students make, which numbers alone can't show."],
+   quant:["Do high school seniors who average 8+ hours of sleep on school nights have higher GPAs than those who average fewer than 6?","Sleep and grades are now defined and measurable, and \"have higher\" doesn't over-claim cause."]}
+];
+const gbNav=document.getElementById('gbNav'), gbBox=document.getElementById('gbBox');
+let gbIdx=0;
+function renderGB(revealed){
+  const m=makeovers[gbIdx];
+  gbNav.querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-pressed',i===gbIdx));
+  const right = revealed ? `
+      <div class="upgrade qual"><span class="pill qual"><span aria-hidden="true">✓ </span>QUALITATIVE UPGRADE</span><div class="q">${m.qual[0]}</div><p class="why">${m.qual[1]}</p></div>
+      <div class="upgrade quant"><span class="pill quant"><span aria-hidden="true">✓ </span>QUANTITATIVE UPGRADE</span><div class="q">${m.quant[0]}</div><p class="why">${m.quant[1]}</p></div>`
+    : `<div class="card" style="display:flex;flex-direction:column;justify-content:center;min-height:220px">
+         <h3>Your turn first <span aria-hidden="true">🤔</span></h3>
+         <p style="color:var(--muted)">Which of the six ingredients is this question missing? How would you rewrite it as a "how" question? As a yes/no question?</p>
+         <div><button class="reveal-btn" id="revealBtn" type="button">Reveal the makeover</button></div>
+       </div>`;
+  gbBox.innerHTML = `
+    <div class="card badq">
+      <span class="pill bad"><span aria-hidden="true">✗ </span>NEEDS WORK</span>
+      <div class="q"><span class="sr">Weak question: </span>"${m.bad}"</div>
+      ${revealed ? `<h3 class="sr" id="gbAnswer" tabindex="-1">What's wrong with it</h3><ul>${m.problems.map(p=>`<li><b>${p[0]}</b> ${p[1]}</li>`).join('')}</ul>` : `<p style="color:var(--muted);margin:0">What's wrong with it?</p>`}
+    </div>
+    <div>${right}</div>`;
+  const rb=document.getElementById('revealBtn'); if(rb) rb.onclick=()=>{renderGB(true);const t=document.getElementById('gbAnswer');if(t)t.focus();};
+}
+makeovers.forEach((m,i)=>{const b=document.createElement('button');b.type='button';b.textContent=m.label;b.onclick=()=>{gbIdx=i;renderGB(false)};gbNav.appendChild(b)});
+renderGB(false);
+
+/* ---------- Builder ---------- */
+let mode='qual';
+const $=id=>document.getElementById(id);
+const bQual=$('bQual'), bQuant=$('bQuant');
+function setMode(m){mode=m;bQual.setAttribute('aria-pressed',m==='qual');bQuant.setAttribute('aria-pressed',m==='quant');$('fQual').hidden=m!=='qual';$('fQuant').hidden=m!=='quant';build();}
+bQual.onclick=()=>setMode('qual'); bQuant.onclick=()=>setMode('quant');
+['qlWho','qlVerb','qlWhat','qlWhere','qtX','qtRel','qtY','qtWho'].forEach(id=>$(id).addEventListener('input',build));
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const blank=t=>`<span class="blank">[${t}]</span>`;
+let plain='';
+function build(){
+  const v=id=>$(id).value.trim();
+  let html, text, checks=[];
+  const loaded=/\b(bad|good|best|worst|addict\w*|toxic|ruin\w*|obsess\w*)\b/i;
+  const vagueWho=/^(teens?|teenagers?|people|kids|students|everyone|young people|gen z)$/i;
+  if(mode==='qual'){
+    const who=v('qlWho'), verb=v('qlVerb'), what=v('qlWhat'), where=v('qlWhere');
+    html=`How do ${who?esc(who):blank('who')} ${esc(verb)} ${what?esc(what):blank('topic')}${where?' '+esc(where):' '+blank('context')}?`;
+    text=`How do ${who} ${verb} ${what}${where?' '+where:''}?`;
+    checks.push(who?(vagueWho.test(who)?['warn','"'+who+'" is very broad. Can you narrow it (grade, school, activity)?']:['ok','Specific group of people']):['todo','Add who you\'re studying']);
+    checks.push(what?['ok','Clear topic to explore']:['todo','Add the topic']);
+    checks.push(where?['ok','Has a context']:['todo','Add a context (where or when)']);
+    checks.push(loaded.test(what+' '+where)?['warn','Contains a loaded word (bad, best, addicted…). Keep it neutral.']:['ok','Neutral wording']);
+    checks.push(['ok','"How" question → plan on interviews or open-ended responses']);
+  } else {
+    const x=v('qtX'), rel=v('qtRel'), y=v('qtY'), who=v('qtWho');
+    const relTxt = rel==='differ by' ? 'differ by' : rel;
+    html=`Does ${x?esc(x):blank('variable 1')} ${esc(relTxt)} ${y?esc(y):blank('variable 2')} among ${who?esc(who):blank('who')}?`;
+    text=`Does ${x} ${relTxt} ${y} among ${who}?`;
+    checks.push(x&&y?['ok','Two variables named']:['todo','Name both variables']);
+    checks.push((x+y).match(/\d|hour|minute|score|scale|grade|gpa|number|times|rating|count|%|percent/i)?['ok','At least one variable sounds measurable']:['warn','How will you measure these? Try adding a unit (hours, score, 1–10 rating).']);
+    checks.push(who?(vagueWho.test(who)?['warn','"'+who+'" is very broad. Can you narrow it?']:['ok','Specific group of people']):['todo','Add who you\'re studying']);
+    checks.push(loaded.test(x+' '+y)?['warn','Contains a loaded word (bad, best, addicted…). Keep it neutral.']:['ok','Neutral wording']);
+    checks.push(rel==='affect'?['warn','"Affect" claims cause and effect. You\'ll need an experiment, not just a survey.']:['ok','Yes/no question → plan on a survey or numeric data']);
+  }
+  plain=text;
+  $('out').innerHTML=html;
+  $('checks').innerHTML=checks.map(c=>`<li><span class="ic ${c[0]}" aria-hidden="true">${c[0]==='ok'?'✓':c[0]==='warn'?'!':'○'}</span><span><span class="sr">${c[0]==='ok'?'Done: ':c[0]==='warn'?'Warning: ':'To do: '}</span>${c[1]}</span></li>`).join('');
+}
+$('fillEx').onclick=()=>{
+  if(mode==='qual'){ $('qlWho').value='high school seniors'; $('qlVerb').value='experience'; $('qlWhat').value='pressure to share college decisions'; $('qlWhere').value='on Instagram during decision season'; }
+  else { $('qtX').value='daily hours on TikTok'; $('qtRel').value='correlate with'; $('qtY').value='self-reported sleep quality (1–10)'; $('qtWho').value='11th graders at my school'; }
+  build();
+};
+$('copyBtn').onclick=async()=>{
+  try{ await navigator.clipboard.writeText(plain); $('copyMsg').textContent='Copied!'; }
+  catch(e){ $('copyMsg').textContent='Copy blocked. Select the text above instead.'; }
+  setTimeout(()=>$('copyMsg').textContent='',2500);
+};
+build();
+
+/* ---------- Quiz ---------- */
+const quiz=[
+  ["How do high school students who play on varsity sports teams describe balancing training with schoolwork?","qual","It's a \"how\" question about experiences. You'd interview the athletes."],
+  ["Do students who use Duolingo daily score higher on Spanish quizzes than students who don't?","quant","Yes/no, with a measurable outcome (quiz scores) compared across two groups."],
+  ["How do teens use YouTube \"study with me\" videos to stay motivated?","qual","Explores a process and its meaning. Interviews or analyzing comments would work."],
+  ["Is the number of followers a student has on Instagram related to their self-esteem score?","quant","Two numbers (follower count, self-esteem scale score) and a yes/no relationship."],
+  ["Does turning on grayscale mode reduce daily screen time among high schoolers over two weeks?","quant","A yes/no experiment with a clear number to measure (minutes of screen time)."],
+  ["How do first-generation college applicants make sense of college admissions advice they see on TikTok?","qual","\"Make sense of\" is about meaning and interpretation, a classic qualitative focus."]
+];
+let qi=0, score=0;
+function renderQuiz(){
+  $('quizProg').innerHTML=quiz.map((_,i)=>`<i class="${i<qi?'done':''}"></i>`).join(''); $('quizProg').setAttribute('aria-hidden','true');
+  const fb=$('quizFb'); fb.className='feedback'; fb.innerHTML='';
+  if(qi>=quiz.length){
+    $('quizCount').textContent='Done!';
+    $('quizQ').textContent=`You got ${score} out of ${quiz.length}. ${score===quiz.length?'Perfect. You\'ve got the shortcut down. 🎉':'Review the shortcut above and try again!'}`;
+    $('ansQual').hidden=$('ansQuant').hidden=true;
+    fb.className='feedback show right'; fb.innerHTML='<button class="next" id="quizRestart" type="button" style="margin:0">Try again</button>';
+    $('quizRestart').onclick=()=>{qi=0;score=0;$('ansQual').hidden=$('ansQuant').hidden=false;renderQuiz();$('quizQ').focus();};
+    return;
+  }
+  $('quizCount').textContent=`Question ${qi+1} of ${quiz.length}`;
+  $('quizQ').textContent='"'+quiz[qi][0]+'"';
+  $('ansQual').disabled=$('ansQuant').disabled=false;
+}
+function answer(a){
+  const [,correct,why]=quiz[qi]; const right=a===correct; if(right) score++;
+  $('ansQual').disabled=$('ansQuant').disabled=true;
+  const fb=$('quizFb'); fb.className='feedback show '+(right?'right':'wrong');
+  fb.innerHTML=`<b>${right?'Correct!':'Not quite. It\'s '+(correct==='qual'?'qualitative':'quantitative')+'.'}</b> ${why}<br><button class="next" id="quizNext" type="button">Next →</button>`;
+  $('quizNext').onclick=()=>{qi++;renderQuiz();$('quizQ').focus();};
+  $('quizNext').focus();
+}
+$('ansQual').onclick=()=>answer('qual'); $('ansQuant').onclick=()=>answer('quant');
+renderQuiz();
+
+/* ---------- Paper anatomy ---------- */
+const sections=[
+ {key:'abstract', name:'Abstract', sub:'the trailer', w:92, color:'#1E2433',
+  len:'150–250 words · 1 paragraph',
+  does:'A short summary of the <b>entire</b> paper: the question, what you did, what you found, and why it matters. Many people will only ever read this part, so it has to stand on its own.',
+  qs:['What did you study and why?','Who participated and how did you collect data?','What were the main findings?','So what?'],
+  tip:'Write it <b>last</b>. You can\'t summarize a paper that doesn\'t exist yet.',
+  mock:`<p><b>Abstract.</b> This study examined whether social media use in the hour before bed is related to sleep quality among high school students. Sixty-two students at one public high school completed an anonymous online survey about their bedtime phone habits and rated their sleep quality on a 1–10 scale. Students who reported more than 60 minutes of scrolling before bed rated their sleep quality lower on average than students who reported less than 15 minutes. These findings suggest that bedtime scrolling and sleep are connected, although this design cannot show that one causes the other.</p>`,
+  real:'The abstract of Lei et al. (2024) packs in the study\'s goals, its sample (30 Chinese middle and high school students), and its three main findings about objectivity, fact-checking strategies, and offline discussion, all in one paragraph.'},
+ {key:'intro', name:'Introduction', sub:'why care?', w:80, color:'#0B6A6A',
+  len:'1–2 pages',
+  does:'Hooks the reader, explains why the topic matters, points out what we <b>don\'t</b> know yet (the "gap"), and ends by stating your research question.',
+  qs:['Why should anyone care about this topic?','What\'s missing from what we already know?','What exactly is your research question?'],
+  tip:'Think of it as a funnel: start with a big, relatable idea, then narrow step by step until you land on your exact question in the last paragraph.',
+  mock:`<p>Ninety percent of the students in our homeroom said they check their phone after getting into bed. Teen sleep is already squeezed by early school start times, and researchers have raised concerns about screens at night. However, most studies survey large national samples, and few ask students directly about scrolling habits in the final hour before sleep. <b>This study asks: Does social media use in the hour before bed correlate with self-reported sleep quality among high school students?</b></p>`,
+  real:'Lei et al. (2024) open by explaining why short video platforms have become a major way young people in China encounter news, and frame the study around <i>news literacy</i>, the skills people use to judge and engage with news.'},
+ {key:'lit', name:'Literature Review', sub:'what\'s known', w:68, color:'#127E9E',
+  len:'2–4 pages · 5–15 sources for a high school paper',
+  does:'Summarizes and connects what other researchers have already found. It shows you\'ve done your homework and sets up why your study is needed.',
+  qs:['What have other studies found about this topic?','Where do they agree or disagree?','What gap does your study fill?'],
+  tip:'Organize by <b>theme</b>, not by source. Instead of "Study A found… Study B found…", write "Several studies link screen time to later bedtimes (Smith, 2021; Lee, 2023), but fewer look at <i>what</i> teens do on screens." Use Google Scholar and ask your school or public librarian for database access.',
+  mock:`<p><b>Screens and sleep.</b> Several studies connect evening screen use with later bedtimes… <b>Social media is different from other screen time.</b> Unlike watching a movie, scrolling is endless and social… <b>The gap.</b> Most of this research uses large national samples and rarely separates bedtime scrolling from daytime use.</p><p style="font-family:'Nunito Sans';font-size:.85rem;color:#5B6475">(Notice the themed subheadings. Each one groups several sources.)</p>`,
+  real:'Lei et al. (2024) split their literature review into two themes: (1) how official news outlets in China have moved onto short video platforms and how government influence shapes young people\'s news use, and (2) a news literacy framework from earlier research, plus how little of that work has looked at Chinese youth.'},
+ {key:'method', name:'Method', sub:'what you did', w:52, color:'#6A3FB5',
+  len:'1–2 pages',
+  does:'Explains exactly how you did the study, in enough detail that someone else could repeat it. Usually split into Participants, Materials, Procedure, and Analysis.',
+  qs:['Who took part, and how did you find them?','What did you use to collect data (survey, interview questions)?','What were the steps?','How did you analyze the data?','How did you protect participants (consent, privacy)?'],
+  tip:'Ethics matter even at the high school level. Get a teacher or advisor to approve your plan, get <b>parent/guardian permission</b> for anyone under 18, keep answers anonymous, and let people skip questions or stop anytime.',
+  mock:`<p><b>Participants.</b> 62 students (grades 9–12) at one public high school, recruited through homeroom announcements, with parent permission. <b>Materials.</b> A 12-question Google Form asking about minutes spent on social media in the hour before bed and a 1–10 sleep quality rating. <b>Procedure.</b> Students completed the survey once, anonymously, in about 5 minutes. <b>Analysis.</b> Average sleep ratings were compared across three scrolling groups, and a correlation was calculated.</p>`,
+  real:'Lei et al. (2024) recruited participants through <i>snowball sampling</i> (each participant suggested others), conducted semi-structured interviews over Zoom, and used <i>thematic analysis</i> to find patterns across the interviews. A <b>different</b> co-authored study by the same research group, on the Disney character LinaBell, used a different qualitative method: analyzing fan posts, videos, and memes on Weibo instead of interviewing people.'},
+ {key:'results', name:'Results', sub:'what you found', w:52, color:'#8A4FD0',
+  len:'1–2 pages · tables & graphs welcome',
+  does:'Reports what you found, <b>without</b> interpreting it yet. Just the facts. In qualitative papers this section is often called <b>Findings</b> and is organized by theme, with quotes from participants.',
+  qs:['What did the data show?','Were there differences between groups?','(Qualitative) What themes came up, and what quotes illustrate them?'],
+  tip:'Save "this means…" and "this is probably because…" for the Discussion. Results = what; Discussion = so what.',
+  mock:`<table class="data"><thead><tr><th>Bedtime scrolling</th><th>Students</th><th>Avg. sleep quality (1–10)</th></tr></thead><tbody><tr><td>Under 15 min</td><td>18</td><td>7.1</td></tr><tr><td>15–60 min</td><td>27</td><td>6.4</td></tr><tr><td>Over 60 min</td><td>17</td><td>5.8</td></tr></tbody></table><p>More bedtime scrolling was moderately associated with lower sleep quality (<i>r</i> = −.34).</p><p style="font-family:'Nunito Sans';font-size:.85rem;color:#5B6475">All numbers are made up for teaching.</p>`,
+  real:'Lei et al. (2024) present three findings, each with its own subheading: students valued objective news but felt platform features worked against it; students described their own strategies for checking news, which leaned heavily on state media; and students rarely commented on news online, preferring to discuss it offline with people they trusted.'},
+ {key:'discussion', name:'Discussion & Conclusion', sub:'so what?', w:72, color:'#127E9E',
+  len:'2–3 pages',
+  does:'Interprets your results: what they mean, how they connect to the studies in your literature review, what the <b>limitations</b> were, and what future research should do. Many papers end with a short Conclusion, either as its own section or as the final paragraphs of the Discussion.',
+  qs:['What do your findings mean?','Do they agree with past research? Why or why not?','What are the limitations?','What should future researchers study next?','What\'s the one-sentence takeaway?'],
+  tip:'Being honest about limitations makes your paper <b>stronger</b>, not weaker. And remember: a correlation doesn\'t prove cause.',
+  mock:`<p>Students who scrolled longer before bed reported lower sleep quality, which is consistent with earlier research on screens and sleep. However, this study cannot tell us whether scrolling hurts sleep, or whether students who already sleep poorly scroll more because they can\'t fall asleep. <b>Limitations</b> include self-reported data and a sample from a single school. Future studies could ask students to keep a sleep diary for two weeks…</p>`,
+  real:'Lei et al. (2024) argue that government influence shapes what young people expect from news and how they verify it, and they compare this with research on young people in Western countries. They openly note a key limitation: most participants were from urban, relatively well-off families, so rural students were not represented.'},
+ {key:'refs', name:'References', sub:'give credit', w:86, color:'#1E2433',
+  len:'As long as it needs to be',
+  does:'A list of every source you cited in the paper, so readers can find them. Every in-text citation must appear here, and every reference here must be cited in the text.',
+  qs:['Which citation style? (Psychology and social sciences usually use <b>APA 7th edition</b>.)','Is every source you cited listed?','Is it alphabetical by author last name?'],
+  tip:'Google Scholar has a "Cite" button that gives you APA format, but always double-check it. Free tools like Zotero can save and format your sources automatically.',
+  mock:`<p class="hanging">Lei, Y., Meng, X., Huang, X., Li, J., Jiang, Y., Yu, Y., &amp; Literat, I. (2024). Short videos, big impact: How Chinese youth perceive and engage with news on short video platforms. <i>Global Media and China</i>. https://doi.org/10.1177/20594364241298055</p><p style="font-family:'Nunito Sans';font-size:.85rem;color:#5B6475">An APA-style reference with a <b>hanging indent</b>. Parts: authors → (year) → title → <i>journal</i> → DOI link.</p>`,
+  real:'In-text, this paper would be cited as (Lei et al., 2024). "Et al." means "and others" and is used in APA when a source has three or more authors.'}
+];
+const hg=$('hourglass'), detail=$('detail'); detail.setAttribute('aria-labelledby','detailTitle');
+let si=0;
+sections.forEach((s,i)=>{
+  const b=document.createElement('button'); b.type='button'; b.className='hg';
+  b.style.width=s.w+'%'; b.style.background=s.color;
+  b.innerHTML=`${s.name}<small>${s.sub}</small>`;
+  b.onclick=()=>{si=i;renderDetail(true);};
+  hg.appendChild(b);
+});
+function renderDetail(move){
+  const s=sections[si];
+  hg.querySelectorAll('.hg').forEach((b,i)=>b.setAttribute('aria-pressed',i===si));
+  detail.innerHTML=`
+    <div class="eyebrow">Section ${si+1} of ${sections.length}</div>
+    <h2 id="detailTitle">${s.name}</h2>
+    <div class="meta"><span><span aria-hidden="true">📏 </span>Length: ${s.len}</span></div>
+    <p>${s.does}</p>
+    <h3 class="sub">Questions it answers</h3>
+    <ul>${s.qs.map(q=>`<li>${q}</li>`).join('')}</ul>
+    <h3 class="sub">Student tip</h3>
+    <p>${s.tip}</p>
+    <h3 class="sub">${s.key==='refs'?'Example':'Made-up student example: "Scroll Before Sleep"'}</h3>
+    <div class="mock">${s.mock}</div>
+    <h3 class="sub">${s.key==='refs'?'In-text citation':'In a real published paper'}</h3>
+    <div class="real"><p>${s.real}</p></div>
+    <div class="detail-nav">
+      <button type="button" id="prevS" ${si===0?'disabled':''}>← ${si>0?sections[si-1].name:''}</button>
+      <button type="button" id="nextS" ${si===sections.length-1?'disabled':''}>${si<sections.length-1?sections[si+1].name:''} →</button>
+    </div>`;
+  $('prevS').onclick=()=>{if(si>0){si--;renderDetail(true);}};
+  $('nextS').onclick=()=>{if(si<sections.length-1){si++;renderDetail(true);}};
+  if(move){
+    detail.focus({preventScroll:true});
+    if(window.matchMedia('(max-width:860px)').matches || detail.getBoundingClientRect().top<0){
+      const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+      const y=detail.getBoundingClientRect().top+window.scrollY-(document.querySelector('header').offsetHeight+12);
+      window.scrollTo({top:y,behavior:reduce?'auto':'smooth'});
+    }
+  }
+}
+renderDetail();
+
+/* ---------- Order game ---------- */
+const order=sections.map(s=>s.name);
+let placed=0;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startGame(){
+  placed=0; $('slots').innerHTML=''; $('gameMsg').textContent=''; $('bank').innerHTML='';
+  let s=shuffle(order); while(s.join()===order.join()) s=shuffle(order);
+  s.forEach(name=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=name;
+    b.onclick=()=>{
+      if(name===order[placed]){
+        placed++; b.remove(); const c=document.createElement('li'); c.className='chip'; c.textContent=placed+'. '+name; $('slots').appendChild(c);
+        $('gameMsg').textContent = placed===order.length ? 'You rebuilt the whole paper! 🎉' : `Correct: ${name} is number ${placed}.`;
+        const nextChip=$('bank').querySelector('button'); (nextChip||$('resetGame')).focus();
+      } else {
+        b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong');
+        $('gameMsg').textContent=`${name} isn't next. Think hourglass: wide, then narrow, then wide.`;
+      }
+    };
+    $('bank').appendChild(b);
+  });
+}
+$('resetGame').onclick=startGame;
+startGame();
+</script>
+</body>
+</html>
